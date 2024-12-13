@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>M3U Playlist</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+    }
+    
+    .playlist-item {
+      background-color: #f7f7f7;
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+    }
+    
+    .playlist-item:last-child {
+      border-bottom: none;
+    }
+    
+    .playlist-item h2 {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    
+    .playlist-item p {
+      font-size: 14px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <input type="text" id="m3u-url" placeholder="Enter M3U URL">
+  <button id="fetch-playlist">Fetch Playlist</button>
+  <div id="playlist-container"></div>
+  
+  <script>
+    const m3uUrlInput = document.getElementById('m3u-url');
+    const fetchPlaylistButton = document.getElementById('fetch-playlist');
+    const playlistContainer = document.getElementById('playlist-container');
+    
+    fetchPlaylistButton.addEventListener('click', () => {
+      const m3uUrl = m3uUrlInput.value;
+      fetchM3UPlaylist(m3uUrl);
+    });
+    
+    function fetchM3UPlaylist(m3uUrl) {
+      fetch(m3uUrl)
+        .then(response => response.text())
+        .then(m3uContent => {
+          const m3uParser = require('m3u-parser');
+          const playlist = m3uParser.parse(m3uContent);
+          displayPlaylist(playlist);
+        })
+        .catch(error => console.error('Error fetching M3U playlist:', error));
+    }
+    
+    function displayPlaylist(playlist) {
+      const playlistHtml = playlist.entries.map((entry) => {
+        return `
+          <div class="playlist-item">
+            <h2>${entry.title}</h2>
+            <p>${entry.artist}</p>
+            <p>Duration: ${entry.duration}</p>
+          </div>
+        `;
+      }).join('');
+      playlistContainer.innerHTML = playlistHtml;
+    }
+  </script>
+</body>
+</html>
